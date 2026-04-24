@@ -145,17 +145,3 @@ Translating sparsity percentages into actual parameter counts: λ=0.001 reduces 
 3. **Layer-wise patterns**: Different layers prune at different rates. The input layer (fc1) prunes most aggressively, the output layer (fc4) least. This makes intuitive sense — raw pixel features are highly redundant, but the final classification layer needs to preserve discriminative information.
 
 4. **Practical value**: This approach eliminates the need for separate pruning steps (train → prune → fine-tune). The network handles it all in one training pass, which is simpler to implement and could be useful for deploying models on resource-constrained hardware.
-
----
-
-## 6. Connection to Research
-
-This project relates to a few lines of work in the pruning literature:
-
-- **Lottery Ticket Hypothesis** (Frankle & Carbin, 2019): They showed that sparse subnetworks ("winning tickets") within randomly initialized dense networks can match the full network's performance when trained in isolation. Our results are consistent with this — the pruned network at λ=0.001 actually outperforms the dense baseline, suggesting we're finding a good sparse subnetwork.
-
-- **Learning Both Weights and Connections** (Han et al., 2015): The original magnitude-based pruning approach — train a dense network, remove small weights, fine-tune. Our method is different because pruning happens *during* training rather than after, but the underlying idea (most connections are unnecessary) is the same.
-
-- **L0 Regularization** (Louizos et al., 2018): They used hard concrete distributions to learn binary gates, which is closer to what we're doing. Our sigmoid gates are a softer version — we don't get exact zeros during training, but the gates get close enough (< 0.01) that the difference is negligible in practice.
-
-The main advantage of our approach over post-hoc pruning methods is simplicity: one training run, one loss function, no separate pruning/fine-tuning stages.
